@@ -11,17 +11,23 @@ class PostPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(?User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Post $post): bool
+    public function view(?User $user, Post $post): bool
     {
-        return false;
+        // everyone can see published posts
+        if ($post->status === 'published') {
+            return true;
+        }
+        
+        // Owner can view own unpublished post
+        return $user && $user->id == $post->user_id;
     }
 
     /**
@@ -29,7 +35,7 @@ class PostPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -37,7 +43,13 @@ class PostPolicy
      */
     public function update(User $user, Post $post): bool
     {
-        return false;
+        // admin can edit everything
+        if ($user->role === "admin") {
+            return true;
+        }
+
+        // Owner Can edit his own Post
+        return $user->id == $post->user_id;
     }
 
     /**
@@ -45,7 +57,13 @@ class PostPolicy
      */
     public function delete(User $user, Post $post): bool
     {
-        return false;
+        // admin can delete anything
+        if ($user->role == "admin") {
+            return true;
+        }
+
+        // Owner Can edit his own Post
+        return $user->id == $post->user_id;
     }
 
     /**
@@ -53,14 +71,23 @@ class PostPolicy
      */
     public function restore(User $user, Post $post): bool
     {
+        // admin can restore anything
+        if ($user->role === "admin") {
+            return true;
+        }
         return false;
     }
+
 
     /**
      * Determine whether the user can permanently delete the model.
      */
     public function forceDelete(User $user, Post $post): bool
     {
+        // admin can restore anything
+        if ($user->role === "admin") {
+            return true;
+        }
         return false;
     }
 }

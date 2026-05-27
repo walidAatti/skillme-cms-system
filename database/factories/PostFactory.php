@@ -29,8 +29,6 @@ class PostFactory extends Factory
 
         'content' => fake()->paragraphs(5, true),
 
-        'featured_image' => fake()->imageUrl(640, 480, 'business', true),
-
     ];
     }
 }

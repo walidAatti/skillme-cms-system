@@ -21,6 +21,7 @@ return new class extends Migration
             $table->longText('content');
             $table->string('featured_image')->nullable();
             $table->enum('status', ['draft', 'published','archived'])->default('draft');
+            $table->index('status');
             $table->softDeletes();
             $table->timestamp('published_at')->nullable();
             $table->timestamps();

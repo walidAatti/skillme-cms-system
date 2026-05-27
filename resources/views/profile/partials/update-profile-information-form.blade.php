@@ -24,7 +24,7 @@
                 <img src="{{ Auth::user()->avatar != 'default-avatar.png'
                         ? asset('storage/' . Auth::user()->avatar)
                         : asset('images/default-avatar.png') }}"
-                        class="w-20 h-20 rounded-full"
+                        class="w-20 h-20 object-cover rounded-full"
                 >
             </div>
             <input id="avatar" name="avatar" type="file" class="mt-1 block w-full"/>

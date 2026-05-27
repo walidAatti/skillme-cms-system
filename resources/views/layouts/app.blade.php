@@ -31,6 +31,45 @@
             <main>
                 {{ $slot }}
             </main>
+
+            <!-- Footer -->
+            <footer class="bg-gray-900 text-white py-8">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                        <div>
+                            <h5 class="font-bold mb-3">SkillMe</h5>
+                            <p class="text-gray-400 text-sm">Your trusted partner for studying abroad in the UK.</p>
+                        </div>
+                        <div>
+                            <h5 class="font-bold mb-3">Quick Links</h5>
+                            <ul class="text-gray-400 text-sm space-y-2">
+                                <li><a href="#" class="hover:text-white">Universities</a></li>
+                                <li><a href="#" class="hover:text-white">Information</a></li>
+                                <li><a href="#" class="hover:text-white">Blog</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5 class="font-bold mb-3">Support</h5>
+                            <ul class="text-gray-400 text-sm space-y-2">
+                                <li><a href="#" class="hover:text-white">FAQ</a></li>
+                                <li><a href="#" class="hover:text-white">Contact</a></li>
+                                <li><a href="#" class="hover:text-white">Terms</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h5 class="font-bold mb-3">Follow Us</h5>
+                            <ul class="text-gray-400 text-sm space-y-2">
+                                <li><a href="#" class="hover:text-white">Facebook</a></li>
+                                <li><a href="#" class="hover:text-white">Twitter</a></li>
+                                <li><a href="#" class="hover:text-white">LinkedIn</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-700 pt-6 text-center text-gray-400 text-sm">
+                        <p>&copy; 2026 SkillMe Agency. All rights reserved.</p>
+                    </div>
+                </div>
+            </footer>
         </div>
     </body>
 </html>
