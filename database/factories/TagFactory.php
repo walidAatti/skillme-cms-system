@@ -19,7 +19,7 @@ class TagFactory extends Factory
      */
     public function definition(): array
     {
-        $name = fake()->sentence(3);
+        $name = fake()->sentence(2);
 
         return [
             'name' => $name,
