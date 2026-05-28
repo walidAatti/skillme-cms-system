@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Post;
@@ -21,5 +22,8 @@ Route::middleware('auth')->group(function () {
 
 // Posts 
 Route::resource('posts', PostController::class);
+
+// Category 
+Route::resource('categories', CategoryController::class);
 
 require __DIR__.'/auth.php';

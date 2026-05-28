@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
@@ -12,7 +14,10 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
+        $this->authorize('viewAny', Category::class);
+        $categories = Category::with('posts')->latest()->paginate(50);
+
+        return view('categories.index', compact('categories'));
     }
 
     /**
@@ -20,7 +25,8 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        //
+        $this->authorize('create', Category::class);
+        return view('categories.create');
     }
 
     /**
@@ -28,7 +34,16 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $validated = $request->validate([
+            'name' => ['required', 'string','max:255', 'unique:categories,name'],
+        ]);
+
+        $validated['slug'] = Str::slug($validated['name']);
+
+        Category::create($validated);
+
+        return Redirect::route('categories.index')->with('success', 'Category created successfully');
     }
 
     /**
@@ -36,7 +51,9 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        //
+        $this->authorize('view', $category);
+        $category->load('posts');
+        return view('categories.show', compact('category'));
     }
 
     /**
@@ -44,7 +61,8 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        //
+        $this->authorize('update', $category);
+        return view('categories.edit', compact('category'));
     }
 
     /**
@@ -52,7 +70,16 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        //
+        $this->authorize('update', $category);
+        $validated = $request->validate([
+            'name' => ['required', 'string','max:255', 'unique:categories,name'],
+        ]);
+
+        $validated['slug'] = Str::slug($validated['name']);
+
+        $category->update($validated);
+
+        return Redirect::route('categories.index')->with('success', 'Category updated successfully');
     }
 
     /**
@@ -60,6 +87,9 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+        $this->authorize('delete', $category);
+        $category->delete();
+
+        return Redirect::route('categories.index')->with('success', 'Category deleted successfully');
     }
 }

@@ -3,66 +3,24 @@
         
         {{-- Header Section with Stats --}}
         <div class="mb-8">
+            
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">Blog Posts</h1>
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
+                        <span class="text-blue-900 text-3xl md:text-4xl ">{{ $category->name }}</span> 
+                        category Posts
+                    </h1>
                     <p class="text-sm text-gray-500 mt-1">Manage and view all your created content</p>
                 </div>
                 @can('create', App\Models\Post::class)
-                    <a href="{{ route('posts.create') }}" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium py-2.5 px-5 rounded-xl shadow-sm hover:shadow transition-all duration-200">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        Create New Post
-                    </a>
+                    <a href="{{ route('posts.create', ['redirect' => url()->current() ]) }}" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium py-2.5 px-5 rounded-xl shadow-sm hover:shadow transition-all duration-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Create New Post
+                </a>
                 @endcan
             </div>
 
-            {{-- Stats Cards --}}
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Posts</p>
-                            <p class="text-2xl font-bold text-gray-900 mt-1">{{ $posts->total() }}</p>
-                        </div>
-                        <div class="bg-blue-50 p-2 rounded-lg">
-                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Published</p>
-                            <p class="text-2xl font-bold text-green-600 mt-1">{{ $posts->where('status', 'published')->count() }}</p>
-                        </div>
-                        <div class="bg-green-50 p-2 rounded-lg">
-                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Drafts</p>
-                            <p class="text-2xl font-bold text-amber-600 mt-1">{{ $posts->where('status', 'draft')->count() }}</p>
-                        </div>
-                        <div class="bg-amber-50 p-2 rounded-lg">
-                            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Categories</p>
-                            <p class="text-2xl font-bold text-blue-900 mt-1">{{ \App\Models\Category::count() }}</p>
-                        </div>
-                        <div class="bg-blue-50 p-2 rounded-lg">
-                            <svg class="w-5 h-5 text-blue-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l5 5a2 2 0 01.586 1.414V19a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
         </div>
 
         @if(session('success'))
@@ -74,7 +32,7 @@
 
         {{-- Posts Grid View (Card Layout) --}}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @forelse($posts as $post)
+            @forelse($category->posts as $post)
                 <div class="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                     {{-- Image Section --}}
                     <div class="relative h-48 overflow-hidden bg-gray-100">
@@ -189,24 +147,17 @@
                             <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-900 mb-1">No posts yet</h3>
-                        <p class="text-sm text-gray-500 mb-4">Get started by creating your first blog post.</p>
                         @can('create', App\Models\Post::class)
-                        <a href="{{ route('posts.create') }}" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            Create your first post
-                        </a>
+                            <p class="text-sm text-gray-500 mb-4">Get started by creating your first blog post.</p>
+                            <a href="{{ route('posts.create', ['redirect' => url()->current()]) }}" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                Create your first post
+                            </a>
                         @endcan
                     </div>
                 </div>
             @endforelse
         </div>
-
-        {{-- Pagination --}}
-        @if($posts->hasPages())
-            <div class="mt-8">
-                {{ $posts->links() }}
-            </div>
-        @endif
 
     </div>
 </x-app-layout>
