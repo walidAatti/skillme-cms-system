@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
+    
     // READ (Index) - List all posts
     public function index()
     {
@@ -22,12 +23,13 @@ class PostController extends Controller
     }
 
     // CREATE (Form) - Show form to create a post
-    public function create()
+    public function create(Request $request)
     {
         $this->authorize('create', Post::class);
         $categories = Category::all();
         $tags = Tag::all();
-        return view('posts.create', compact('categories', 'tags'));
+        $redirect = $request->redirect;
+        return view('posts.create', compact('categories', 'tags', 'redirect'));
     }
 
     // CREATE (Store) - Save the new post
@@ -129,6 +131,9 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         $this->authorize('delete', $post);
+        if ($post->featured_image) {
+            Storage::disk('public')->delete($post->featured_image);
+        }
         $post->delete();
 
         return redirect()->route('posts.index')->with('success', 'Post deleted successfully.');

@@ -15,7 +15,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
+        <div class="min-h-screen flex flex-col bg-gray-100">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
@@ -28,7 +28,7 @@
             @endisset
 
             <!-- Page Content -->
-            <main>
+            <main class="flex-1">
                 {{ $slot }}
             </main>
 
@@ -44,8 +44,7 @@
                             <h5 class="font-bold mb-3">Quick Links</h5>
                             <ul class="text-gray-400 text-sm space-y-2">
                                 <li><a href="#" class="hover:text-white">Universities</a></li>
-                                <li><a href="#" class="hover:text-white">Information</a></li>
-                                <li><a href="#" class="hover:text-white">Blog</a></li>
+                                <li><a href="/posts" class="hover:text-white">Blog</a></li>
                             </ul>
                         </div>
                         <div>

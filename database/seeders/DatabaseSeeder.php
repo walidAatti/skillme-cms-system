@@ -21,6 +21,26 @@ class DatabaseSeeder extends Seeder
     {
         User::factory()->create();
 
+        // adding myemail for testing
+        User::firstOrCreate(
+            ['email' => 'adminwalid@gmail.com'],
+            [
+            'name' => 'walid admin',
+            'password' => bcrypt('walid000'),
+            'role' => 'admin'
+        ]);
+
+        // adding myemail for testing
+        User::firstOrCreate(
+            ['email' => 'walidaatti1@gmail.com'],
+            [
+            'name' => 'walid',
+            'password' => bcrypt('walid000'),
+            'role' => 'author'
+        ]);
+
+
+
         $categories = Category::factory(3)->create();
 
         $post = Post::factory()->create(['user_id' => 1]);

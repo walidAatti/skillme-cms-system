@@ -29,6 +29,7 @@ class StorePostRequest extends FormRequest
             $slug = $slug . '-' . ($count + 1);
         }
 
+
         $this->merge([
             'slug' => $slug,
             'user_id' => Auth::id(),
