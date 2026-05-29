@@ -41,30 +41,31 @@ class DatabaseSeeder extends Seeder
 
 
 
-        $categories = Category::factory(3)->create();
+        $category = Category::factory()->create();
 
-        $post = Post::factory()->create(['user_id' => 1]);
+        $posts = Post::factory(3)->create(['user_id' => 1]);
 
         // attach only one ID
         // $category->posts()->attach($post->id);
 
         // attach mutltiple IDs
-        // $category->posts()->attach($posts->pluck('id'));
-
-        $post->categories()->attach($categories->pluck('id'));
+        $category->posts()->attach($posts->pluck('id'));
 
         // tags
         $tags = Tag::factory(5)->create();
 
-        $post->tags()->attach($tags->pluck('id'));
+        
 
-        // comments
-        $comments = Comment::factory(5)->create(
+        $posts->each(fn($post) => $post->tags()->attach($tags->pluck('id')));
+
+        $posts->each(fn($post) => 
+            Comment::factory(5)->create(
             [
                 'user_id' => 1,
                 'post_id' => $post->id,
             ]
-        );
+        ));
+        
         
     }
 }

@@ -10,7 +10,7 @@ class Comment extends Model
     /** @use HasFactory<\Database\Factories\CommentFactory> */
     use HasFactory;
 
-    protected $fillable = ['parent_id', 'content', 'status'];
+    protected $fillable = ['user_id', 'parent_id', 'content', 'status'];
 
     function post() {
         return $this->belongsTo(Post::class);

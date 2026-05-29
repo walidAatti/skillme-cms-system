@@ -18,7 +18,7 @@ class PostController extends Controller
     public function index()
     {
         $this->authorize('viewAny', Post::class);
-        $posts = Post::with(['categories', 'tags'])->where('status', 'published')->latest()->paginate(10);
+        $posts = Post::with(['categories', 'tags'])->where('status', 'published')->latest()->paginate(15);
         return view('posts.index', compact('posts'));
     }
 
@@ -136,6 +136,6 @@ class PostController extends Controller
         }
         $post->delete();
 
-        return redirect()->route('posts.index')->with('success', 'Post deleted successfully.');
+        return redirect()->route('posts.index')->with('danger', 'Post deleted successfully.');
     }
 }

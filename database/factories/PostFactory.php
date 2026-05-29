@@ -29,7 +29,9 @@ class PostFactory extends Factory
 
         'content' => fake()->paragraphs(5, true),
 
-        'status' => 'published'
+        'featured_image' => 'posts/OqWodDO422Ob1DKOirHD9bXGuOtElC38KdSGnqqH.jpg',
+
+        'status' => 'published',
 
     ];
     }

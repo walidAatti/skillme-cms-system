@@ -1,9 +1,9 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
-use App\Models\Post;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -21,9 +21,17 @@ Route::middleware('auth')->group(function () {
 });
 
 // Posts 
-Route::resource('posts', PostController::class);
+Route::resource('posts', PostController::class)->scoped(['post' => 'slug']);
 
 // Category 
-Route::resource('categories', CategoryController::class);
+Route::resource('categories', CategoryController::class)->scoped(['category' => 'slug']);
+
+// Comments
+
+// add a comment
+Route::post('posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
+
+// delete a comment
+Route::delete('comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
 require __DIR__.'/auth.php';
