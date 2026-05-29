@@ -107,7 +107,7 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        <span>{{ $post->created_at->format('F j, Y') }}</span>
+                        <span>{{ $post->created_at->format('M j, Y') }}</span>
                     </div>
                     
                     <div class="flex items-center gap-1.5">
@@ -225,10 +225,9 @@
                                     <div class="flex-1">
                                         <div class="flex items-center gap-2 mb-2">
                                             {{-- User Avatar Image --}}
-                                                            <img src="{{ asset($comment->user->avatar !== 'default-avatar.png' ? 'storage/' . $comment->user->avatar : 'images/default-avatar.png') }}" 
-                                                                alt="{{ $comment->user->name ?? 'Anonymous' }}" 
-                                                                class="w-8 h-8 rounded-full object-cover border border-gray-200"
-                                                            >
+                                            <img src="{{ asset($comment->user->avatar !== 'default-avatar.png' ? 'storage/' . $comment->user->avatar : 'images/default-avatar.png') }}" 
+                                                alt="{{ $comment->user->name ?? 'Anonymous' }}" 
+                                                class="w-8 h-8 rounded-full object-cover border border-gray-200">
                                             <span class="font-semibold text-gray-900">{{ $comment->user->name ?? 'Anonymous' }}</span>
                                             <span class="text-xs text-gray-400">{{ $comment->created_at->diffForHumans() }}</span>
                                         </div>
@@ -250,7 +249,7 @@
                                 
                                 {{-- Reply Button --}}
                                 <button type="button" 
-                                        onclick="document.getElementById('replyForm-{{ $comment->id }}').classList.toggle('hidden')" 
+                                        onclick="toggleReplyForm({{ $comment->id }})" 
                                         class="mt-3 text-sm text-blue-600 hover:text-blue-800 transition flex items-center gap-1">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
@@ -258,6 +257,17 @@
                                     Reply
                                 </button>
                                 
+                                {{-- Toggle Replies Button --}}
+                                @if($comment->replies->isNotEmpty())
+                                    <button type="button" 
+                                            onclick="toggleReplies({{ $comment->id }})" 
+                                            class="mt-2 text-sm text-gray-500 hover:text-gray-700 transition flex items-center gap-1">
+                                        <svg id="toggleIcon-{{ $comment->id }}" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                        <span id="toggleText-{{ $comment->id }}">Show {{ $comment->replies->count() }} {{ Str::plural('Reply', $comment->replies->count()) }}</span>
+                                    </button>
+                                @endif
                                 
                                 {{-- Reply Form (Hidden by default) --}}
                                 <div id="replyForm-{{ $comment->id }}" class="hidden mt-4 pl-6 border-l-2 border-blue-200">
@@ -282,14 +292,12 @@
                                     </form>
                                     @else
                                     <a href="{{ route('login') }}" class="text-blue-600 hover:underline font-semibold py-3">Login</a> to reply to this comment.
-                                @endauth
+                                    @endauth
                                 </div>
                                 
-                                
-                                
-                                {{-- Replies --}}
+                                {{-- Replies Container with Toggle --}}
                                 @if($comment->replies->isNotEmpty())
-                                    <div class="mt-4 pl-6 space-y-3">
+                                    <div id="repliesContainer-{{ $comment->id }}" class="hidden mt-4 pl-6 space-y-3">
                                         <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Replies</p>
                                         @foreach($comment->replies as $reply)
                                             <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
@@ -299,8 +307,7 @@
                                                             {{-- User Avatar Image --}}
                                                             <img src="{{ asset($reply->user->avatar != 'default-avatar.png' ? 'storage/' . $reply->user->avatar : 'images/default-avatar.png') }}" 
                                                                 alt="{{ $reply->user->name ?? 'Anonymous' }}" 
-                                                                class="w-8 h-8 rounded-full object-cover border border-gray-200"
-                                                            >
+                                                                class="w-8 h-8 rounded-full object-cover border border-gray-200">
                                                             <span class="font-semibold text-gray-900 text-sm">{{ $reply->user->name ?? 'Anonymous' }}</span>
                                                             <span class="text-xs text-gray-400">{{ $reply->created_at->diffForHumans() }}</span>
                                                         </div>
@@ -373,6 +380,83 @@
         @endauth
     </div>
 </div>
+
+{{-- JavaScript with LocalStorage Persistence --}}
+<script>
+    // Get the post ID from the URL or pass it from Laravel
+    const postId = {{ $post->id }};
+    const storageKey = `post_${postId}_open_replies`;
+    
+    function toggleReplyForm(commentId) {
+        const form = document.getElementById(`replyForm-${commentId}`);
+        if (form) {
+            form.classList.toggle('hidden');
+        }
+    }
+    
+    function toggleReplies(commentId) {
+        const repliesContainer = document.getElementById(`repliesContainer-${commentId}`);
+        const toggleIcon = document.getElementById(`toggleIcon-${commentId}`);
+        const toggleText = document.getElementById(`toggleText-${commentId}`);
+        
+        if (!repliesContainer || !toggleIcon || !toggleText) {
+            console.error('Elements not found for comment:', commentId);
+            return;
+        }
+        
+        // Get current open replies from localStorage
+        let openReplies = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        
+        if (repliesContainer.classList.contains('hidden')) {
+            // Show replies
+            repliesContainer.classList.remove('hidden');
+            toggleIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>';
+            const currentText = toggleText.innerHTML;
+            toggleText.innerHTML = currentText.replace('Show', 'Hide');
+            
+            // Add to localStorage
+            if (!openReplies.includes(commentId)) {
+                openReplies.push(commentId);
+                localStorage.setItem(storageKey, JSON.stringify(openReplies));
+            }
+        } else {
+            // Hide replies
+            repliesContainer.classList.add('hidden');
+            toggleIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>';
+            const currentText = toggleText.innerHTML;
+            toggleText.innerHTML = currentText.replace('Hide', 'Show');
+            
+            // Remove from localStorage
+            openReplies = openReplies.filter(id => id !== commentId);
+            localStorage.setItem(storageKey, JSON.stringify(openReplies));
+        }
+    }
+    
+    // Restore open replies state after page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const openReplies = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        
+        openReplies.forEach(commentId => {
+            const repliesContainer = document.getElementById(`repliesContainer-${commentId}`);
+            const toggleIcon = document.getElementById(`toggleIcon-${commentId}`);
+            const toggleText = document.getElementById(`toggleText-${commentId}`);
+            
+            if (repliesContainer && toggleIcon && toggleText) {
+                // Show replies
+                repliesContainer.classList.remove('hidden');
+                toggleIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>';
+                const currentText = toggleText.innerHTML;
+                toggleText.innerHTML = currentText.replace('Show', 'Hide');
+            }
+        });
+    });
+    
+    // Make functions available globally
+    window.toggleReplyForm = toggleReplyForm;
+    window.toggleReplies = toggleReplies;
+</script>
+
+
 
     </div>
 </x-app-layout>
