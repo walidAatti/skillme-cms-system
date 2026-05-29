@@ -11,6 +11,17 @@
             </a>
         </div>
 
+        {{-- comment added message --}}
+        @if(session('comment'))
+            <x-alert type='success' :message="session('comment')"></x-alert>
+        @endif
+
+        {{-- delete comment message --}}
+        @if(session('comment_deleted'))
+            <x-alert type='danger' :message="session('comment_deleted')"></x-alert>
+        @endif
+        
+
         {{-- Main Article Card --}}
         <article class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
             
@@ -189,8 +200,179 @@
             </div>
         </div>
 
-        {{-- Optional: Add some spacing for better readability --}}
-        <div class="h-8"></div>
+{{-- Comments Section --}}
+<div class="mt-8 mb-10">
+    
+    {{-- Display Comments --}}
+    @if($post->comments->isNotEmpty())
+        <div class="pt-6 border-t border-gray-200">
+            <div class="mb-6">
+                <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                    </svg>
+                    Comments ({{ $post->comments->count() }})
+                </h3>
+            </div>
+            
+            <div class="space-y-4">
+                @foreach($post->comments as $comment)
+                    @if(!$comment->parent_id)
+                        {{-- Main Comment --}}
+                        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition" id="comment-{{ $comment->id }}">
+                            <div class="p-5">
+                                <div class="flex justify-between items-start gap-4">
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            {{-- User Avatar Image --}}
+                                                            <img src="{{ asset($comment->user->avatar !== 'default-avatar.png' ? 'storage/' . $comment->user->avatar : 'images/default-avatar.png') }}" 
+                                                                alt="{{ $comment->user->name ?? 'Anonymous' }}" 
+                                                                class="w-8 h-8 rounded-full object-cover border border-gray-200"
+                                                            >
+                                            <span class="font-semibold text-gray-900">{{ $comment->user->name ?? 'Anonymous' }}</span>
+                                            <span class="text-xs text-gray-400">{{ $comment->created_at->diffForHumans() }}</span>
+                                        </div>
+                                        <p class="text-gray-700 leading-relaxed">{{ $comment->content }}</p>
+                                    </div>
+                                    
+                                    @can('delete', $comment)
+                                        <form action="{{ route('comments.destroy', $comment) }}" method="POST" onsubmit="return confirm('Delete this comment?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-gray-400 hover:text-red-600 transition p-1" title="Delete comment">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    @endcan
+                                </div>
+                                
+                                {{-- Reply Button --}}
+                                <button type="button" 
+                                        onclick="document.getElementById('replyForm-{{ $comment->id }}').classList.toggle('hidden')" 
+                                        class="mt-3 text-sm text-blue-600 hover:text-blue-800 transition flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+                                    </svg>
+                                    Reply
+                                </button>
+                                
+                                
+                                {{-- Reply Form (Hidden by default) --}}
+                                <div id="replyForm-{{ $comment->id }}" class="hidden mt-4 pl-6 border-l-2 border-blue-200">
+                                    @auth
+                                    <form action="{{ route('comments.store', $post) }}" method="POST" class="space-y-3">
+                                        @csrf
+                                        <input type="hidden" name="parent_id" value="{{ $comment->id }}">
+                                        <textarea name="comment" 
+                                                    rows="2" 
+                                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-none"
+                                                    placeholder="Write your reply..." required></textarea>
+                                        <div class="flex gap-2">
+                                            <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition">
+                                                Post Reply
+                                            </button>
+                                            <button type="button" 
+                                                    onclick="document.getElementById('replyForm-{{ $comment->id }}').classList.add('hidden')" 
+                                                    class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-medium rounded-lg transition">
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </form>
+                                    @else
+                                    <a href="{{ route('login') }}" class="text-blue-600 hover:underline font-semibold py-3">Login</a> to reply to this comment.
+                                @endauth
+                                </div>
+                                
+                                
+                                
+                                {{-- Replies --}}
+                                @if($comment->replies->isNotEmpty())
+                                    <div class="mt-4 pl-6 space-y-3">
+                                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Replies</p>
+                                        @foreach($comment->replies as $reply)
+                                            <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                                                <div class="flex justify-between items-start gap-4">
+                                                    <div class="flex-1">
+                                                        <div class="flex items-center gap-2 mb-1">
+                                                            {{-- User Avatar Image --}}
+                                                            <img src="{{ asset($reply->user->avatar != 'default-avatar.png' ? 'storage/' . $reply->user->avatar : 'images/default-avatar.png') }}" 
+                                                                alt="{{ $reply->user->name ?? 'Anonymous' }}" 
+                                                                class="w-8 h-8 rounded-full object-cover border border-gray-200"
+                                                            >
+                                                            <span class="font-semibold text-gray-900 text-sm">{{ $reply->user->name ?? 'Anonymous' }}</span>
+                                                            <span class="text-xs text-gray-400">{{ $reply->created_at->diffForHumans() }}</span>
+                                                        </div>
+                                                        <p class="text-gray-700 text-sm">{{ $reply->content }}</p>
+                                                    </div>
+                                                    
+                                                    @can('delete', $reply)
+                                                        <form action="{{ route('comments.destroy', $reply) }}" method="POST" onsubmit="return confirm('Delete this reply?');">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="text-gray-400 hover:text-red-600 transition p-1" title="Delete reply">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                                </svg>
+                                                            </button>
+                                                        </form>
+                                                    @endcan
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+                @endforeach
+            </div>
+        </div>
+    @endif
+    
+    {{-- Add Comment Form --}}
+    <div class="mt-8 bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+        @auth
+            <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+                Add a Comment
+            </h4>
+            
+            <form action="{{ route('comments.store', $post) }}" method="POST" class="space-y-4">
+                @csrf
+                <textarea name="comment" 
+                          rows="3" 
+                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-none @error('comment') border-red-500 @enderror"
+                          placeholder="Share your thoughts..." required>{{ old('comment') }}</textarea>
+                
+                @error('comment')
+                    <p class="text-sm text-red-600 flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        {{ $message }}
+                    </p>
+                @enderror
+                
+                <div class="flex justify-end">
+                    <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition shadow-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                        </svg>
+                        Post Comment
+                    </button>
+                </div>
+            </form>
+        @else
+            <p class="text-gray-600">
+                <a href="{{ route('login') }}" class="text-blue-600 hover:underline font-semibold">Login</a> to comment on this post.
+            </p>
+        @endauth
+    </div>
+</div>
 
     </div>
 </x-app-layout>
