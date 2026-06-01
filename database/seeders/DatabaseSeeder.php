@@ -7,6 +7,9 @@ use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\Comment;
+use App\Models\Country;
+use App\Models\Program;
+use App\Models\University;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -65,7 +68,23 @@ class DatabaseSeeder extends Seeder
                 'post_id' => $post->id,
             ]
         ));
+
+        Country::factory(3)->create();
         
-        
+        $country = Country::firstOrCreate([
+            'name' => 'England',
+            'iso_code' => 'EN',
+            'slug' => 'england'
+        ]);
+
+        $universities = University::factory(3)->create([
+            'country_id' => $country->id,
+        ]);
+
+        $universities->each(fn($uni) => 
+            Program::factory(3)->create([
+                'university_id' => $uni->id,
+            ])
+        );
     }
 }

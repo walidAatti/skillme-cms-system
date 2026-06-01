@@ -15,6 +15,7 @@
                     <x-nav-link href="/">Home</x-nav-link>
                     <x-nav-link :href="route('posts.index')">Blog</x-nav-link>
                     <x-nav-link :href="route('categories.index')">Categories</x-nav-link>
+                    <x-nav-link :href="route('countries.index')">Countries</x-nav-link>
                     
                     {{-- dahsboard --}}
                     @auth
