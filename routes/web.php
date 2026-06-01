@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\CountryController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UniversityController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -33,5 +35,16 @@ Route::post('posts/{post}/comments', [CommentController::class, 'store'])->name(
 
 // delete a comment
 Route::delete('comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+
+
+// UNIVERSITY DIRECTORY SYSTEM
+
+// COUNTRY RESOURCE
+Route::resource('countries', CountryController::class)
+;
+// University RESOURCE
+Route::resource('universities', UniversityController::class);
+
+
 
 require __DIR__.'/auth.php';
