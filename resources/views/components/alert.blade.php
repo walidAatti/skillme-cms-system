@@ -3,12 +3,14 @@
 @php
     $styles = [
         'success' => 'bg-green-50 border-green-500 text-green-700',
-        'danger' => 'bg-red-50 border-red-500 text-red-700'
+        'danger' => 'bg-red-50 border-red-500 text-red-700',
+        'warning' => 'bg-orange-50 border-orange-500 text-orange-700',
 ];
 
     $icons = [
         'success' => 'text-green-600',
         'danger' => 'text-red-600',
+        'warning' => 'text-orange-600',
     ]
 @endphp
 

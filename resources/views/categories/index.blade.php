@@ -95,13 +95,13 @@
                             <h3 class="text-white font-bold text-xl">{{ $category->name }}</h3>
                         </div>
                         
-                        {{-- Post Count Badge --}}
+                    {{-- Post Count Badge --}}
                         <div class="absolute top-3 right-3">
                             <span class="inline-flex items-center gap-1 bg-white/90 backdrop-blur-sm text-blue-600 px-2.5 py-1 rounded-lg text-xs font-semibold shadow-sm">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
                                 </svg>
-                                {{ $category->posts->count() }} {{ Str::plural('Post', $category->posts->count()) }}
+                                {{ $category->posts->count() }} {{ Str::plural('Post',  $category->posts->count()) }}
                             </span>
                         </div>
                     </div>

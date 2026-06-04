@@ -136,6 +136,6 @@ class PostController extends Controller
         }
         $post->delete();
 
-        return redirect()->route('posts.index')->with('danger', 'Post deleted successfully.');
+        return redirect(request('redirect_to', route('posts.index')))->with('danger', 'Post deleted successfully.');
     }
 }

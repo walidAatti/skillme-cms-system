@@ -49,7 +49,7 @@ class CountryController extends Controller
 
         Country::create($validated);
 
-        return redirect()->route('countries.index')->with('success', 'Country Created Succesfully');
+        return redirect()->route('countries.index')->with('success', 'Country ' . $validated['name'] . ' Created Succesfully');
     }
 
     /**
@@ -93,7 +93,7 @@ class CountryController extends Controller
 
         $country->update($validated);
 
-        return redirect()->route('countries.index')->with('success', 'Country Updated Succesfully');
+        return redirect()->route('countries.index')->with('warning', 'Country ' . $country->name . ' Updated Succesfully');
     }
 
     /**
@@ -107,6 +107,6 @@ class CountryController extends Controller
         }
         $country->delete();
 
-        return redirect()->route('countries.index')->with('danger', 'Country Deleted Succesfully');
+        return redirect()->route('countries.index')->with('danger', 'Country ' . $country->name . ' Deleted Succesfully');
     }
 }

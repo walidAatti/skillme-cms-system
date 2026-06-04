@@ -8,10 +8,13 @@
                     <h1 class="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">Blog Posts</h1>
                     <p class="text-sm text-gray-500 mt-1">Manage and view all your created content</p>
                 </div>
-                <a href="{{ route('posts.create') }}" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium py-2.5 px-5 rounded-xl shadow-sm hover:shadow transition-all duration-200">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                    Create New Post
-                </a>
+                @can('create', App\Models\Post::class)
+                    <a href="{{ route('posts.create') }}" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium py-2.5 px-5 rounded-xl shadow-sm hover:shadow transition-all duration-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Create New Post
+                    </a>
+                @endcan
+                
             </div>
 
             {{-- Stats Cards --}}
