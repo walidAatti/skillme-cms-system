@@ -43,7 +43,7 @@
                         <div>
                             <h5 class="font-bold mb-3">Quick Links</h5>
                             <ul class="text-gray-400 text-sm space-y-2">
-                                <li><a href="#" class="hover:text-white">Universities</a></li>
+                                <li><a href="/universities" class="hover:text-white">Universities</a></li>
                                 <li><a href="/posts" class="hover:text-white">Blog</a></li>
                             </ul>
                         </div>

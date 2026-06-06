@@ -17,8 +17,8 @@
                 <div class="text-center">
                     @if ($country->flag)
                         <img class="w-24 h-24 rounded-full border-4 border-white shadow-lg object-cover mx-auto mb-3" 
-                             src="{{ asset('storage/' . $country->flag) }}" 
-                             alt="{{ $country->name }}">
+                                src="{{ asset('storage/' . $country->flag) }}" 
+                                alt="{{ $country->name }}">
                     @else
                         <div class="w-24 h-24 rounded-full border-4 border-white shadow-lg flex items-center justify-center bg-white/20 backdrop-blur-sm mx-auto mb-3">
                             <span class="text-5xl">🏳️</span>
@@ -64,12 +64,12 @@
                             </svg>
                             Universities in {{ $country->name }}
                         </h2>
-                        <p class="text-sm text-gray-500 mt-1">Total: {{ $country->universities->count() }} {{ Str::plural('University', $country->universities->count()) }}</p>
+                        <p class="text-sm text-gray-500 mt-1">Total: {{ $country->universities->count() }} {{ Str::plural('University') }}</p>
                     </div>
                     
                     @auth
                         <a href="{{ route('universities.create', ['country_id' => $country->id]) }}" 
-                           class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition">
+                            class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                             </svg>
@@ -139,19 +139,16 @@
                         </div>
                         <h3 class="text-lg font-semibold text-gray-900 mb-2">No Universities Yet</h3>
                         <p class="text-gray-500 mb-6">There are no universities added for {{ $country->name }} yet.</p>
-                        @auth
+                        @can('create', App\Models\University::class)
                             <a href="{{ route('universities.create', ['country_id' => $country->id]) }}" 
-                               class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-5 rounded-lg transition">
+                                class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-5 rounded-lg transition">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                                 </svg>
                                 Add First University
                             </a>
-                        @else
-                            <p class="text-sm text-gray-500">
-                                <a href="{{ route('login') }}" class="text-blue-600 hover:underline">Login</a> to add universities.
-                            </p>
-                        @endauth
+                        @endcan
+                            
                     </div>
                 @endif
             </div>
@@ -167,7 +164,7 @@
                 Back to Countries
             </a>
             
-            @auth
+            @can('update', $country)
                 <div class="flex gap-3">
                     <a href="{{ route('countries.edit', $country) }}" 
                        class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition shadow-sm">
@@ -188,7 +185,7 @@
                         </button>
                     </form>
                 </div>
-            @endauth
+            @endcan
         </div>
 
     </div>

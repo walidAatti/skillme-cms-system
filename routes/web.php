@@ -40,10 +40,10 @@ Route::delete('comments/{comment}', [CommentController::class, 'destroy'])->name
 // UNIVERSITY DIRECTORY SYSTEM
 
 // COUNTRY RESOURCE
-Route::resource('countries', CountryController::class)
-;
+Route::resource('countries', CountryController::class)->scoped(['country' => 'slug']);
+
 // University RESOURCE
-Route::resource('universities', UniversityController::class);
+Route::resource('universities', UniversityController::class)->scoped(['university' => 'slug']);
 
 
 

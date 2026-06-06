@@ -11,11 +11,12 @@
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link href="/">Home</x-nav-link>
-                    <x-nav-link :href="route('posts.index')">Blog</x-nav-link>
-                    <x-nav-link :href="route('categories.index')">Categories</x-nav-link>
-                    <x-nav-link :href="route('countries.index')">Countries</x-nav-link>
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex ">
+                    <x-nav-link href="/" :active="request()->is('/')">Home</x-nav-link>
+                    <x-nav-link :href="route('posts.index')" :active="request()->is('posts')">Posts</x-nav-link>
+                    <x-nav-link :href="route('categories.index')" :active="request()->is('categories')">Categories</x-nav-link>
+                    <x-nav-link :href="route('countries.index')" :active="request()->is('countries')">Countries</x-nav-link>
+                    <x-nav-link :href="route('universities.index')" :active="request()->is('universities')">Universities</x-nav-link>
                     
                     {{-- dahsboard --}}
                     @auth
@@ -92,7 +93,14 @@
 
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
+        <div class=" pt-2 pb-3 space-y-1">
+
+            <x-responsive-nav-link href="/" :active="request()->is('/')">Home</x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('posts.index')" :active="request()->is('posts')">Posts</x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('categories.index')" :active="request()->is('categories')">Categories</x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('countries.index')" :active="request()->is('countries')">Countries</x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('universities.index')" :active="request()->is('universities')">Universities</x-responsive-nav-link>
+
             @auth
                 <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                     {{ __('Dashboard') }}

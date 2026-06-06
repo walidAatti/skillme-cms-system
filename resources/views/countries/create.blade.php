@@ -32,7 +32,7 @@
                             id="name" 
                             value="{{ old('name') }}"
                             class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @error('name') border-red-500 @enderror"
-                            placeholder="Enter your category name"
+                            placeholder="Enter your country name"
                             required>
                     @error('name')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -50,7 +50,7 @@
                             id="iso_code" 
                             value="{{ old('iso_code') }}"
                             class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @error('iso_code') border-red-500 @enderror"
-                            placeholder="Enter your category country Code"
+                            placeholder="Enter your country Code"
                             required>
                     @error('iso_code')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>

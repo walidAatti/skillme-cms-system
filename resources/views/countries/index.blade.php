@@ -76,6 +76,10 @@
             <x-alert type="success" :message="session('success')"></x-alert>
         @endif
 
+        @if(session('warning'))
+            <x-alert type="warning" :message="session('warning')"></x-alert>
+        @endif
+
         {{-- DELETE --}}
         @if(session('danger'))
             <x-alert type="danger" :message="session('danger')"></x-alert>
