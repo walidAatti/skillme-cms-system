@@ -164,7 +164,7 @@
                 Back to Countries
             </a>
             
-            @auth
+            @can('update', $country)
                 <div class="flex gap-3">
                     <a href="{{ route('countries.edit', $country) }}" 
                        class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition shadow-sm">
@@ -185,7 +185,7 @@
                         </button>
                     </form>
                 </div>
-            @endauth
+            @endcan
         </div>
 
     </div>

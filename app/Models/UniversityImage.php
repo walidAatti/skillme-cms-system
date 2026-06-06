@@ -10,7 +10,6 @@ class UniversityImage extends Model
         'university_id',
         'image_path',
         'alt_text',
-        'sort_order',
     ];
 
     function university() {

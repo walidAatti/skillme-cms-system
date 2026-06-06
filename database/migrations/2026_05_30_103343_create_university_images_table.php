@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignIdFor(University::class)->constrained()->cascadeOnDelete();
             $table->string('image_path');
             $table->string('alt_text')->nullable();
-            $table->integer('sort_order')->nullable();
             $table->timestamps();
         });
     }

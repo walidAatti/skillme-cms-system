@@ -6,6 +6,7 @@ use App\Models\University;
 use App\Http\Requests\StoreUniversityRequest;
 use App\Http\Requests\UpdateUniversityRequest;
 use App\Models\Country;
+use App\Models\UniversityImage;
 use Illuminate\Support\Facades\Storage;
 
 class UniversityController extends Controller
@@ -42,7 +43,25 @@ class UniversityController extends Controller
             $validated['logo'] = $request->file('logo')->store('universities', 'public');
         }
 
-        University::create($validated);
+        if ($request->hasFile('images')) {
+            $validated['images'] = [];
+            foreach ($request->file('images') as $image) {
+                $validated['images'][] = $image->store('universities', 'public');
+            }
+        }
+
+        $university = University::create($validated);
+
+        // FILL the array with image data
+        $images = [];
+
+        foreach ($validated['images'] as $image) {
+            $images[] = [
+                'image_path' => $image,
+            ];
+        }
+
+        $university->images()->createMany($images);
 
         return redirect()->route('universities.index')->with('success', 'University ' . $validated['name'] . ' Created Successfully');
     }
@@ -71,9 +90,9 @@ class UniversityController extends Controller
      */
     public function update(UpdateUniversityRequest $request, University $university)
     {
+        
         $this->authorize('update', $university);
         $validated = $request->validated();
-
         
         // handle update
         if (($request->hasFile('logo'))) {
@@ -89,6 +108,34 @@ class UniversityController extends Controller
             $university->logo = null;
         }
 
+        // Handle Updating Images
+        if ($request->hasFile('images')) {
+            $validated['images'] = [];
+            foreach ($request->file('images') as $image) {
+                $validated['images'][] = $image->store('universities', 'public');
+            }
+        }
+
+        // Handle Deleting Images from Storage + DB
+        if ($request->has('delete_images')) {
+            foreach ($request->delete_images as $imageId) {
+                $image = UniversityImage::findOrFail($imageId);
+                Storage::disk('public')->delete($image->image_path);
+                $image->delete();
+            }
+        }
+
+        // Store New Images Records in DB
+        if (!empty($validated['images'])) {
+            $images = [];
+            foreach ($validated['images'] as $image) {
+                $images[] = [
+                    'image_path' => $image,
+                ];
+            }
+            $university->images()->createMany($images);
+        }
+
         $university->update($validated);
 
         return redirect()->route('universities.index')->with('warning', 'University ' . $university->name . ' Updated Successfully');
@@ -100,6 +147,13 @@ class UniversityController extends Controller
     public function destroy(University $university)
     {
         $this->authorize('delete', $university);
+
+        // delete images from storage
+        if($university->images) {
+            foreach ($university->images as $image) {
+                Storage::disk('public')->delete($image->image_path);
+            }
+        }
 
         if ($university->logo) {
             Storage::disk('public')->delete($university->logo);

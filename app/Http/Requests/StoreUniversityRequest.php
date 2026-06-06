@@ -34,6 +34,8 @@ class StoreUniversityRequest extends FormRequest
             'city' => ['required', 'string'],
             'slug' => ['required', 'string', Rule::unique('universities', 'slug')],
             'logo' => ['nullable', 'image', 'mimes:png,jpg,webp,jpeg', 'max:2048'],
+            'images' => ['nullable', 'array', 'max:5'],
+            'images.*' => ['image', 'mimes:png,jpg,webp,jpeg', 'max:2048'],
             'about' => ['required', 'string'],
             'accommodation' => ['required', 'string'],
             'finance' => ['required', 'string'],

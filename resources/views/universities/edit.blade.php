@@ -17,7 +17,7 @@
         </div>
 
         {{-- Form --}}
-        <form action="{{ route('universities.update', $university ) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <form id="updateUniversityForm" action="{{ route('universities.update', $university ) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @method('PUT')
 
@@ -132,6 +132,59 @@
                         </div>
                     </div>
                     @error('logo')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- University Images --}}
+                <div class="p-6 border-b border-gray-200">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        University Images
+                    </label>
+                    
+                    {{-- Existing Images Preview --}}
+                    @if($university->images && $university->images->count() > 0)
+                        <div class="mb-4">
+                            <p class="text-sm text-gray-600 mb-3">Current images:</p>
+                            <div id="existingImagesGrid" class="flex flex-wrap gap-3 mb-4">
+                                @foreach($university->images->sortBy('created_at') as $image)
+                                    <div class="relative inline-block" data-image-id="{{ $image->id }}">
+                                        <img src="{{ asset('storage/' . $image->image_path) }}" alt="University Image" class="h-32 w-32 rounded-lg border border-gray-200 object-cover">
+                                        <button type="button" class="removeExistingImage absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition shadow-lg" data-image-id="{{ $image->id }}">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- New Images Preview --}}
+                    <div id="imagesPreviewContainer" class="hidden mb-4">
+                        <p class="text-sm text-gray-600 mb-3">New images:</p>
+                        <div id="imagesGrid" class="flex flex-wrap gap-3">
+                            {{-- Preview items will be inserted here dynamically --}}
+                        </div>
+                    </div>
+
+                    {{-- File Input --}}
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-blue-500 transition cursor-pointer" id="imagesUploadArea">
+                        <div class="space-y-1 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <div class="flex text-sm text-gray-600">
+                                <label for="images" class="relative flex mx-auto cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
+                                    <span>Upload images</span>
+                                    <input id="images" name="images[]" type="file" class="sr-only" accept="image/*" multiple>
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-500">PNG, JPG, JPEG, WEBP up to 2MB each (Max 5 images)</p>
+                        </div>
+                    </div>
+                    @error('images')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
@@ -278,6 +331,105 @@
             uploadArea.classList.remove('bg-gray-50');
         });
 
+        // University Images preview
+        const imagesPreviewContainer = document.getElementById('imagesPreviewContainer');
+        const imagesGrid = document.getElementById('imagesGrid');
+        const imagesInput = document.getElementById('images');
+        const imagesUploadArea = document.getElementById('imagesUploadArea');
+
+        imagesInput.addEventListener('change', function(e) {
+            imagesGrid.innerHTML = '';
+            const files = Array.from(e.target.files);
+            
+            if (files.length > 0) {
+                imagesPreviewContainer.classList.remove('hidden');
+            }
+
+            files.forEach((file, index) => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const previewItem = document.createElement('div');
+                        previewItem.className = 'relative inline-block';
+                        previewItem.innerHTML = `
+                            <img src="${e.target.result}" alt="Image ${index + 1}" class="h-32 w-32 rounded-lg border border-gray-200 object-cover">
+                            <button type="button" class="removeImage absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition shadow-lg" data-index="${index}">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        `;
+                        imagesGrid.appendChild(previewItem);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+
+        // Remove new image preview
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.removeImage')) {
+                const button = e.target.closest('.removeImage');
+                const index = parseInt(button.getAttribute('data-index'));
+                const dataTransfer = new DataTransfer();
+                
+                Array.from(imagesInput.files).forEach((file, i) => {
+                    if (i !== index) {
+                        dataTransfer.items.add(file);
+                    }
+                });
+                
+                imagesInput.files = dataTransfer.files;
+                
+                if (imagesInput.files.length === 0) {
+                    imagesPreviewContainer.classList.add('hidden');
+                } else {
+                    const event = new Event('change');
+                    imagesInput.dispatchEvent(event);
+                }
+            }
+        });
+
+       // Remove existing image
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.removeExistingImage')) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const button = e.target.closest('.removeExistingImage');
+                const imageId = button.getAttribute('data-image-id');
+                
+                console.log('Button clicked, image ID:', imageId); // Debug
+                
+                // Find the parent container
+                const imageContainer = button.closest('div[data-image-id]');
+                
+                console.log('Image container found:', imageContainer); // Debug
+                
+                if (!imageContainer) {
+                    console.error('Container not found!');
+                    return;
+                }
+                
+                // Create hidden input to mark for deletion
+                const deleteInput = document.createElement('input');
+                deleteInput.type = 'hidden';
+                deleteInput.name = 'delete_images[]';
+                deleteInput.value = imageId;
+
+                const form = document.getElementById('updateUniversityForm');
+                form.appendChild(deleteInput);
+                
+                console.log('Form found for appending:', form); // Debug
+                console.log('Hidden input created:', deleteInput.outerHTML); // Debug
+                console.log('Form now has delete_images inputs:', form.querySelectorAll('input[name="delete_images[]"]').length); // Debug
+                
+                // Remove from UI
+                setTimeout(() => {
+                    imageContainer.remove();
+                }, 100);
+            }
+        }); 
 
     </script>
 
